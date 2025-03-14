@@ -1,17 +1,29 @@
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import type { RegisterForm } from "../types";
 import ErrorMessages from "../components/ErrorMessages";
 
 export default function RegisterView() {
+  const initialValues : RegisterForm = {
+    name: "",
+    email: "",
+    handle: "",
+    password: "",
+    password_confirmation: "",
+  };
+
   const {
     register,
     formState: { errors },
     watch,
     handleSubmit,
-  } = useForm();
+  } = useForm({ defaultValues: initialValues });
 
-  const handleRegister = () => {
-    console.log("Desde el handleRegister");
+  const password = watch("password");
+
+  // console.log(password);
+  const handleRegister = (formData : RegisterForm) => {
+    console.log(formData);
   };
 
   return (
@@ -33,7 +45,7 @@ export default function RegisterView() {
             className="bg-slate-100 border-none p-3 rounded-lg placeholder-slate-400"
             {...register("name", { required: "El nombre es requerido" })}
           />
-          {errors.name && <ErrorMessages>{errors.name.message}</ErrorMessages>}  
+          {errors.name && <ErrorMessages>{errors.name.message}</ErrorMessages>}
         </div>
         <div className="grid grid-cols-1 space-y-3">
           <label htmlFor="email" className="text-2xl text-slate-500">
@@ -44,10 +56,17 @@ export default function RegisterView() {
             type="email"
             placeholder="Email de Registro"
             className="bg-slate-100 border-none p-3 rounded-lg placeholder-slate-400"
-            {...register("email", { required: "El email es requerido" })}
+            {...register("email", {
+              required: "El email es requerido",
+              pattern: {
+                value: /\S+@\S+\.\S+/,
+                message: "E-mail no válido",
+              },
+            })}
           />
-          {errors.email && <ErrorMessages>{errors.email.message}</ErrorMessages>}  
-
+          {errors.email && (
+            <ErrorMessages>{errors.email.message}</ErrorMessages>
+          )}
         </div>
         <div className="grid grid-cols-1 space-y-3">
           <label htmlFor="handle" className="text-2xl text-slate-500">
@@ -60,8 +79,9 @@ export default function RegisterView() {
             className="bg-slate-100 border-none p-3 rounded-lg placeholder-slate-400"
             {...register("handle", { required: "El hanlde es requerido" })}
           />
-          {errors.handle && <ErrorMessages>{errors.handle.message}</ErrorMessages>}  
-
+          {errors.handle && (
+            <ErrorMessages>{errors.handle.message}</ErrorMessages>
+          )}
         </div>
         <div className="grid grid-cols-1 space-y-3">
           <label htmlFor="password" className="text-2xl text-slate-500">
@@ -79,10 +99,10 @@ export default function RegisterView() {
                 message: "El password debe tener al menos 6 caracteres",
               },
             })}
-            
           />
-          {errors.password && <ErrorMessages>{errors.password.message}</ErrorMessages>}  
-          
+          {errors.password && (
+            <ErrorMessages>{errors.password.message}</ErrorMessages>
+          )}
         </div>
 
         <div className="grid grid-cols-1 space-y-3">
@@ -99,14 +119,15 @@ export default function RegisterView() {
             className="bg-slate-100 border-none p-3 rounded-lg placeholder-slate-400"
             {...register("password_confirmation", {
               required: "El password es requerido",
-              minLength: {
-                value: 6,
-                message: "El password debe tener al menos 6 caracteres",
-              },
+              validate: (value) =>
+                value === password || "Las contraseñas no coinciden",
             })}
           />
-          {errors.password_confirmation && <ErrorMessages>{errors.password_confirmation.message}</ErrorMessages>}  
-
+          {errors.password_confirmation && (
+            <ErrorMessages>
+              {errors.password_confirmation.message}
+            </ErrorMessages>
+          )}
         </div>
 
         <input
